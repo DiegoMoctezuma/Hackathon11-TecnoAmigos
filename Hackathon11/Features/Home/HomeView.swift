@@ -74,10 +74,16 @@ struct HomeView: View {
     private var headerSection: some View {
         HStack(alignment: .top) {
             VStack(alignment: .leading, spacing: 4) {
-                Text("Hola")
-                    .font(FontTheme.title2)
-                    .foregroundStyle(ColorTheme.adaptiveText)
-                    .accessibilityAddTraits(.isHeader)
+                HStack{
+                    Image("Logopng")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(height: 40)
+                    Text("Hola")
+                        .font(FontTheme.title2)
+                        .foregroundStyle(ColorTheme.adaptiveText)
+                        .accessibilityAddTraits(.isHeader)
+                }
                 
                 Text(Date().formatted(.dateTime.weekday(.wide).day().month(.wide).locale(Locale(identifier: "es"))))
                     .font(FontTheme.subheadline)

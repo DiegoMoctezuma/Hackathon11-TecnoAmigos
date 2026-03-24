@@ -7,16 +7,16 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		06CD1DF12F71E0D0005E29A9 /* Hackathon11.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Hackathon11.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		06CD1DF12F71E0D0005E29A9 /* ARGOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ARGOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		069399E82F72F74600F50B81 /* Exceptions for "Hackathon11" folder in "Hackathon11" target */ = {
+		069399E82F72F74600F50B81 /* Exceptions for "Hackathon11" folder in "ARGOS" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
 			);
-			target = 06CD1DF02F71E0D0005E29A9 /* Hackathon11 */;
+			target = 06CD1DF02F71E0D0005E29A9 /* ARGOS */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
@@ -24,7 +24,7 @@
 		06CD1DF32F71E0D0005E29A9 /* Hackathon11 */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				069399E82F72F74600F50B81 /* Exceptions for "Hackathon11" folder in "Hackathon11" target */,
+				069399E82F72F74600F50B81 /* Exceptions for "Hackathon11" folder in "ARGOS" target */,
 			);
 			path = Hackathon11;
 			sourceTree = "<group>";
@@ -53,7 +53,7 @@
 		06CD1DF22F71E0D0005E29A9 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				06CD1DF12F71E0D0005E29A9 /* Hackathon11.app */,
+				06CD1DF12F71E0D0005E29A9 /* ARGOS.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -61,9 +61,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		06CD1DF02F71E0D0005E29A9 /* Hackathon11 */ = {
+		06CD1DF02F71E0D0005E29A9 /* ARGOS */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 06CD1DFC2F71E0D2005E29A9 /* Build configuration list for PBXNativeTarget "Hackathon11" */;
+			buildConfigurationList = 06CD1DFC2F71E0D2005E29A9 /* Build configuration list for PBXNativeTarget "ARGOS" */;
 			buildPhases = (
 				06CD1DED2F71E0D0005E29A9 /* Sources */,
 				06CD1DEE2F71E0D0005E29A9 /* Frameworks */,
@@ -76,11 +76,11 @@
 			fileSystemSynchronizedGroups = (
 				06CD1DF32F71E0D0005E29A9 /* Hackathon11 */,
 			);
-			name = Hackathon11;
+			name = ARGOS;
 			packageProductDependencies = (
 			);
 			productName = Hackathon11;
-			productReference = 06CD1DF12F71E0D0005E29A9 /* Hackathon11.app */;
+			productReference = 06CD1DF12F71E0D0005E29A9 /* ARGOS.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -98,7 +98,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 06CD1DEC2F71E0CF005E29A9 /* Build configuration list for PBXProject "Hackathon11" */;
+			buildConfigurationList = 06CD1DEC2F71E0CF005E29A9 /* Build configuration list for PBXProject "ARGOS" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -112,7 +112,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				06CD1DF02F71E0D0005E29A9 /* Hackathon11 */,
+				06CD1DF02F71E0D0005E29A9 /* ARGOS */,
 			);
 		};
 /* End PBXProject section */
@@ -336,7 +336,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		06CD1DEC2F71E0CF005E29A9 /* Build configuration list for PBXProject "Hackathon11" */ = {
+		06CD1DEC2F71E0CF005E29A9 /* Build configuration list for PBXProject "ARGOS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				06CD1DFA2F71E0D2005E29A9 /* Debug */,
@@ -345,7 +345,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		06CD1DFC2F71E0D2005E29A9 /* Build configuration list for PBXNativeTarget "Hackathon11" */ = {
+		06CD1DFC2F71E0D2005E29A9 /* Build configuration list for PBXNativeTarget "ARGOS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				06CD1DFD2F71E0D2005E29A9 /* Debug */,

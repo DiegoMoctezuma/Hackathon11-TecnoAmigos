@@ -226,7 +226,7 @@ struct TopicActionsBar: View {
     
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 12) {
+            HStack(spacing: 30) {
                 actionButton(
                     icon: "arrow.triangle.2.circlepath",
                     title: "Diferente",
@@ -238,7 +238,6 @@ struct TopicActionsBar: View {
                     title: isShortSummary ? "Más largo" : "Más corto",
                     action: onToggleLength
                 )
-                
                 actionButton(
                     icon: "link",
                     title: "Relacionar",
@@ -256,7 +255,7 @@ struct TopicActionsBar: View {
         }
         .glassEffect(in: .rect(cornerRadius: 20))
         .padding(.horizontal, 8)
-        .padding(.bottom, 4)
+        .padding(.bottom, 90)
         .accessibilityElement(children: .contain)
         .accessibilityLabel("Acciones del tema")
     }
