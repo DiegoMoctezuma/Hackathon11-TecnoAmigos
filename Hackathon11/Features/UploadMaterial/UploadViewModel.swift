@@ -55,9 +55,9 @@ final class UploadViewModel {
             var enrichedTopics: [ProcessingResult.DetectedTopic] = []
             
             for topic in topics {
-                let shortSummary = await SummaryGenerationService.shared.generateSummary(
-                    from: topic.fullSummary, length: .short
-                )
+                let shortSummary = (try? await SummaryGenerationService.shared.generateSummary(
+                    for: topic.fullSummary, length: .short
+                )) ?? topic.fullSummary
                 enrichedTopics.append(ProcessingResult.DetectedTopic(
                     title: topic.title,
                     shortSummary: shortSummary,

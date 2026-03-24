@@ -15,7 +15,7 @@ struct AboutView: View {
                     .padding(.top, 20)
                     .accessibilityHidden(true)
                 
-                Text("EchoStudy")
+                Text("ARGOS")
                     .font(FontTheme.largeTitle)
                     .foregroundStyle(ColorTheme.adaptiveText)
                 
@@ -30,7 +30,7 @@ struct AboutView: View {
                         .foregroundStyle(ColorTheme.adaptiveText)
                         .accessibilityAddTraits(.isHeader)
                     
-                    Text("No adaptamos una app para que sea accesible — la diseñamos desde la perspectiva de quien no puede ver. EchoStudy empodera a estudiantes con discapacidad visual para estudiar de forma autónoma.")
+                    Text("No adaptamos una app para que sea accesible — la diseñamos desde la perspectiva de quien no puede ver. ARGOS empodera a estudiantes con discapacidad visual para estudiar de forma autónoma.")
                         .font(FontTheme.body)
                         .foregroundStyle(ColorTheme.adaptiveTextSecondary)
                 }

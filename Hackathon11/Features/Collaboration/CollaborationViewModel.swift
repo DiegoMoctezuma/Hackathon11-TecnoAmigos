@@ -8,5 +8,5 @@ import SwiftUI
 @MainActor
 final class CollaborationViewModel {
     var showShareSheet: Bool = false
-    var shareMessage: String = "Envía tus fotos de apuntes o pizarrones a esta app y EchoStudy los procesará automáticamente."
+    var shareMessage: String = "Envía tus fotos de apuntes o pizarrones a esta app y ARGOS los procesará automáticamente."
 }

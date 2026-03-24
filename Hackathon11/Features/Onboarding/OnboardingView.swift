@@ -1,6 +1,6 @@
 // OnboardingView.swift
 // EchoStudy
-// A11Y: 4-step onboarding narrated by voice
+// A11Y: 4-step onboarding narrated by voice + calibration + accessibility setup
 
 import SwiftUI
 
@@ -8,36 +8,53 @@ struct OnboardingView: View {
     @Environment(VoiceEngine.self) private var voiceEngine
     @AppStorage(PreferenceKeys.hasCompletedOnboarding) private var hasCompletedOnboarding = false
     @State private var viewModel = OnboardingViewModel()
+    @State private var showCalibration = false
+    @State private var showAccessibilitySetup = false
     
     private let pages: [(icon: String, title: String, description: String, narration: String)] = [
         (
-            "waveform.and.mic",
-            "Tu voz es la interfaz",
-            "EchoStudy se controla con tu voz. Habla para buscar, preguntar, navegar y estudiar. Todo funciona sin necesidad de ver la pantalla.",
-            "Bienvenido a EchoStudy. Esta app se controla con tu voz. Puedes hablar para buscar, preguntar, navegar y estudiar. Todo funciona sin necesidad de ver la pantalla."
+            "graduationcap.fill",
+            "Bienvenido a ARGOS",
+            "Tu compañero de estudio accesible. Diseñado para que aprendas con tu voz, a tu ritmo.",
+            "Bienvenido a ARGOS. Tu compañero de estudio accesible."
         ),
         (
-            "doc.text.viewfinder",
-            "Sube cualquier material",
-            "Fotos de pizarrones, PDFs, documentos. La IA extrae el texto, detecta temas y genera resúmenes que puedes escuchar.",
-            "Puedes subir fotos de pizarrones, PDFs o documentos. La inteligencia artificial extrae el texto, detecta temas y genera resúmenes que puedes escuchar."
+            "camera.fill",
+            "Sube fotos y documentos",
+            "Sube fotos de pizarrones, PDFs o apuntes. La IA los convierte en resúmenes organizados por tema.",
+            "Sube fotos de pizarrones, PDFs o apuntes. La IA los convierte en resúmenes organizados por tema."
         ),
         (
-            "brain.head.profile",
-            "Estudia con IA",
-            "Pide explicaciones alternativas, profundiza en temas, relaciona conceptos. EchoStudy es tu compañero de estudio paciente.",
-            "Puedes pedir explicaciones alternativas, profundizar en temas y relacionar conceptos. EchoStudy es tu compañero de estudio paciente."
+            "waveform.circle.fill",
+            "Estudia a tu ritmo",
+            "Escucha resúmenes, pregunta con tu voz, haz quizzes orales. Todo controlado por voz.",
+            "Estudia a tu ritmo. Escucha resúmenes, pregunta con tu voz, haz quizzes orales."
         ),
         (
-            "questionmark.bubble",
-            "Evalúate con quiz oral",
-            "La IA genera preguntas sobre tus temas. Responde con voz y recibe feedback inmediato. Estudia de forma activa.",
-            "La IA genera preguntas sobre tus temas. Responde con voz y recibe feedback inmediato. Comencemos."
+            "person.fill.checkmark",
+            "Tú tienes el control",
+            "Corrige la IA, elige el orden, aprende como quieras. EchoStudy se adapta a ti.",
+            "Tú tienes el control. Corrige la IA, elige el orden, aprende como quieras."
         )
     ]
     
     var body: some View {
         VStack(spacing: 0) {
+            // MARK: - Step Indicator
+            HStack(spacing: 8) {
+                ForEach(0..<pages.count, id: \.self) { index in
+                    Capsule()
+                        .fill(index <= viewModel.currentPage
+                              ? ColorTheme.accentHex
+                              : ColorTheme.adaptiveTextSecondary.opacity(0.3))
+                        .frame(height: 4)
+                }
+            }
+            .padding(.horizontal, 24)
+            .padding(.top, 16)
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel("Página \(viewModel.currentPage + 1) de \(pages.count)")
+            
             Spacer()
             
             // MARK: - Page Content
@@ -47,47 +64,27 @@ struct OnboardingView: View {
                         .tag(index)
                 }
             }
-            .tabViewStyle(.page(indexDisplayMode: .always))
-            .frame(height: 400)
+            .tabViewStyle(.page(indexDisplayMode: .never))
+            .frame(height: 420)
             
             Spacer()
             
             // MARK: - Navigation
             VStack(spacing: 16) {
-                // Voice speed calibration on last page
-                if viewModel.isLastPage {
-                    VStack(spacing: 8) {
-                        Text("Velocidad de voz: \(viewModel.voiceSpeed, specifier: "%.1f")x")
-                            .font(FontTheme.subheadline)
-                            .foregroundStyle(ColorTheme.adaptiveText)
-                        
-                        Slider(value: $viewModel.voiceSpeed, in: 0.5...2.0, step: 0.25)
-                            .tint(ColorTheme.accentHex)
-                            .accessibilityLabel("Velocidad de voz")
-                            .accessibilityValue("\(viewModel.voiceSpeed, specifier: "%.1f") equis")
-                            .onChange(of: viewModel.voiceSpeed) { _, newValue in
-                                voiceEngine.speedRate = newValue
-                                voiceEngine.speak("Esta es la velocidad seleccionada", priority: .immediate)
-                            }
-                    }
-                    .padding(.horizontal, 32)
-                }
-                
                 Button {
                     HapticService.shared.medium()
                     if viewModel.isLastPage {
-                        voiceEngine.speedRate = viewModel.voiceSpeed
-                        hasCompletedOnboarding = true
+                        showCalibration = true
                     } else {
                         viewModel.nextPage()
                     }
                 } label: {
-                    Text(viewModel.isLastPage ? "Comenzar" : "Siguiente")
+                    Text(viewModel.isLastPage ? "Configurar voz" : "Siguiente")
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(PrimaryButtonStyle())
                 .padding(.horizontal, 32)
-                .accessibilityHint(viewModel.isLastPage ? "Toca para comenzar a usar EchoStudy" : "Toca para ver la siguiente página")
+                .accessibilityHint(viewModel.isLastPage ? "Configura la velocidad de voz" : "Ir a la siguiente página")
                 
                 if !viewModel.isLastPage {
                     Button("Saltar") {
@@ -95,7 +92,7 @@ struct OnboardingView: View {
                     }
                     .font(FontTheme.subheadline)
                     .foregroundStyle(ColorTheme.adaptiveTextSecondary)
-                    .accessibilityLabel("Saltar introducción")
+                    .accessibilityLabel("Saltar introducción e ir al inicio")
                 }
             }
             .padding(.bottom, 40)
@@ -107,37 +104,43 @@ struct OnboardingView: View {
         .onAppear {
             voiceEngine.speak(pages[0].narration, priority: .high)
         }
+        .fullScreenCover(isPresented: $showCalibration) {
+            VoiceCalibrationView(onComplete: {
+                showCalibration = false
+                showAccessibilitySetup = true
+            })
+        }
+        .fullScreenCover(isPresented: $showAccessibilitySetup) {
+            AccessibilitySetupView(onComplete: {
+                showAccessibilitySetup = false
+                hasCompletedOnboarding = true
+            })
+        }
     }
     
     private func onboardingPage(index: Int) -> some View {
         let page = pages[index]
-        return VStack(spacing: 24) {
+        return VStack(spacing: 28) {
             Image(systemName: page.icon)
-                .font(.system(size: 64))
+                .font(.system(size: 72))
                 .symbolRenderingMode(.hierarchical)
                 .foregroundStyle(ColorTheme.accentHex)
-                .symbolEffect(.bounce)
+                .symbolEffect(.bounce, value: viewModel.currentPage)
                 .accessibilityHidden(true)
             
             Text(page.title)
-                .font(FontTheme.title)
+                .font(FontTheme.largeTitle)
                 .foregroundStyle(ColorTheme.adaptiveText)
                 .multilineTextAlignment(.center)
                 .accessibilityAddTraits(.isHeader)
             
             Text(page.description)
-                .font(FontTheme.body)
+                .font(FontTheme.title3)
                 .foregroundStyle(ColorTheme.adaptiveTextSecondary)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 32)
         }
         .accessibilityElement(children: .combine)
         .accessibilityLabel("Paso \(index + 1) de \(pages.count). \(page.title). \(page.description)")
-    }
-}
-
-struct Onbo_pre: PreviewProvider {
-    static var previews: some View {
-        OnboardingView()
     }
 }

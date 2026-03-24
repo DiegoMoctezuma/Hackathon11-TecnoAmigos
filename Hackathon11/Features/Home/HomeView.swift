@@ -46,20 +46,23 @@ struct HomeView: View {
             HapticService.shared.light()
         }
         .background(ColorTheme.backgroundGradient.ignoresSafeArea())
-        .navigationTitle("EchoStudy")
+        .navigationTitle("ARGOS")
         .sheet(isPresented: $viewModel.showNewSubjectSheet) {
             NewSubjectSheet()
         }
         .announceOnAppear(
             subjects.isEmpty
-                ? "Inicio de EchoStudy. No tienes materias aún. Sube tu primer material."
-                : "Inicio de EchoStudy. Tienes \(subjects.count) materias."
+                ? "Inicio de ARGOS. No tienes materias aún. Sube tu primer material."
+                : "Inicio de ARGOS. Tienes \(subjects.count) materias."
         )
         .onAppear {
+            // Pre-populate mock data if database is empty
+            MockDataProvider.populateIfNeeded(context: modelContext)
+            
             // A11Y: Announce empty state via voice for first-time users
             if subjects.isEmpty {
                 voiceEngine.speak(
-                    "Bienvenido a EchoStudy. No tienes materias todavía. Toca el botón Subir material nuevo para comenzar.",
+                    "Bienvenido a ARGOS. No tienes materias todavía. Toca el botón Subir material nuevo para comenzar.",
                     priority: .normal
                 )
             }
@@ -71,12 +74,12 @@ struct HomeView: View {
     private var headerSection: some View {
         HStack(alignment: .top) {
             VStack(alignment: .leading, spacing: 4) {
-                Text("Hola, estudiante")
+                Text("Hola")
                     .font(FontTheme.title2)
                     .foregroundStyle(ColorTheme.adaptiveText)
                     .accessibilityAddTraits(.isHeader)
                 
-                Text(Date().formatted(.dateTime.weekday(.wide).day().month(.wide)))
+                Text(Date().formatted(.dateTime.weekday(.wide).day().month(.wide).locale(Locale(identifier: "es"))))
                     .font(FontTheme.subheadline)
                     .foregroundStyle(ColorTheme.adaptiveTextSecondary)
                 

@@ -21,32 +21,33 @@ struct AppTabView: View {
                             destinationView(for: route)
                         }
                 }
+                .accessibilityLabel(AppTab.home.accessibilityLabel)
             }
-            .accessibilityLabel(AppTab.home.accessibilityLabel)
+            
             
             // MARK: - Upload Tab
             Tab(AppTab.upload.rawValue, systemImage: AppTab.upload.iconName, value: AppTab.upload) {
                 NavigationStack {
                     UploadMaterialView()
                 }
+                .accessibilityLabel(AppTab.upload.accessibilityLabel)
             }
-            .accessibilityLabel(AppTab.upload.accessibilityLabel)
             
             // MARK: - Quiz Tab
             Tab(AppTab.quiz.rawValue, systemImage: AppTab.quiz.iconName, value: AppTab.quiz) {
                 NavigationStack {
                     QuizSetupView()
                 }
+                .accessibilityLabel(AppTab.quiz.accessibilityLabel)
             }
-            .accessibilityLabel(AppTab.quiz.accessibilityLabel)
             
             // MARK: - Settings Tab
             Tab(AppTab.settings.rawValue, systemImage: AppTab.settings.iconName, value: AppTab.settings) {
                 NavigationStack {
                     SettingsView()
                 }
+                .accessibilityLabel(AppTab.settings.accessibilityLabel)
             }
-            .accessibilityLabel(AppTab.settings.accessibilityLabel)
         }
         .overlay {
             FloatingVoiceButton()
@@ -64,8 +65,6 @@ struct AppTabView: View {
             TopicDetailView(topic: topic)
         case .uploadMaterialToSubject(let subject):
             UploadMaterialView(preselectedSubject: subject)
-        case .quizResults(let session):
-            QuizResultsView(session: session)
         case .voiceSettings:
             VoiceSettingsView()
         case .accessibilitySettings:
@@ -74,6 +73,12 @@ struct AppTabView: View {
             DataPrivacyView()
         case .about:
             AboutView()
+        case .quizHistory:
+            QuizHistoryView()
+        case .collaboration:
+            ShareLinkGenerator()
+        case .collaborationOnboarding:
+            CollaborationOnboarding()
         default:
             EmptyView()
         }

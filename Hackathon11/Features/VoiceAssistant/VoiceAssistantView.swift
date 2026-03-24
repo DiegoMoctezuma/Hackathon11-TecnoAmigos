@@ -11,6 +11,7 @@ struct VoiceAssistantView: View {
     var contextTopic: Topic? = nil
     
     @Environment(VoiceEngine.self) private var voiceEngine
+    @Environment(AppRouter.self) private var router
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
     @State private var viewModel = VoiceAssistantViewModel()
@@ -85,9 +86,10 @@ struct VoiceAssistantView: View {
                     TranscriptionView(text: voiceEngine.transcribedText)
                 }
                 
-                // MARK: - Waveform
+                // MARK: - Waveform (driven by real mic input)
                 VoiceWaveformView(
                     isActive: voiceEngine.state == .listening || voiceEngine.state == .speaking,
+                    audioLevel: voiceEngine.audioLevel,
                     barCount: 7
                 )
                 .frame(height: 40)
@@ -111,9 +113,9 @@ struct VoiceAssistantView: View {
             voiceEngine.onCommandDetected = { command in
                 handleCommand(command)
             }
-            voiceEngine.speak("Asistente de EchoStudy. ¿En qué puedo ayudarte?")
+            voiceEngine.speak("Asistente de ARGOS. ¿En qué puedo ayudarte?")
         }
-        .announceOnAppear("Asistente de voz de EchoStudy. Habla o escribe tu pregunta.")
+        .announceOnAppear("Asistente de voz de ARGOS. Habla o escribe tu pregunta.")
     }
     
     // MARK: - Input Area
@@ -167,8 +169,8 @@ struct VoiceAssistantView: View {
                 }
                 .accessibilityLabel(showTextInput ? "Cambiar a entrada de voz" : "Cambiar a entrada de texto")
                 
-                // Voice button (main CTA)
-                VoiceButton(state: voiceEngine.state, size: 64) {
+                // Voice button (main CTA) — ring reacts to real mic level
+                VoiceButton(state: voiceEngine.state, audioLevel: voiceEngine.audioLevel, size: 64) {
                     toggleListening()
                 }
                 
@@ -237,6 +239,35 @@ struct VoiceAssistantView: View {
     }
     
     private func handleCommand(_ command: VoiceCommand) {
+        // Navigation commands: close assistant and navigate
+        if command.isNavigation || command.isUploadAction {
+            voiceEngine.stopListening()
+            HapticService.shared.success()
+            
+            let destinationName: String
+            switch command {
+            case .goHome: destinationName = "Inicio"
+            case .goUpload: destinationName = "Subir material"
+            case .goQuiz: destinationName = "Quiz"
+            case .goSettings: destinationName = "Ajustes"
+            case .goBack: destinationName = "pantalla anterior"
+            case .openCamera: destinationName = "cámara"
+            case .openGallery: destinationName = "galería"
+            case .openDocument: destinationName = "documentos"
+            default: destinationName = ""
+            }
+            
+            voiceEngine.speak("Abriendo \(destinationName)")
+            
+            // Dismiss the assistant sheet, then navigate
+            dismiss()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                router.navigateByVoice(command)
+            }
+            return
+        }
+        
+        // Audio control commands
         switch command {
         case .pause: voiceEngine.pause()
         case .resume: voiceEngine.continueSpeaking()
@@ -370,7 +401,7 @@ struct AssistantResponseCard: View {
             .frame(maxWidth: 300, alignment: message.role == .user ? .trailing : .leading)
             // A11Y: Combine for VoiceOver
             .accessibilityElement(children: .combine)
-            .accessibilityLabel("\(message.role == .user ? "Tú" : "EchoStudy"): \(message.content)")
+            .accessibilityLabel("\(message.role == .user ? "Tú" : "ARGOS"): \(message.content)")
             
             if message.role == .assistant { Spacer(minLength: 60) }
         }
@@ -444,9 +475,10 @@ struct GeneratedContentView: View {
             
             // Transparency
             AITransparencyCard(
-                title: "Contenido generado",
                 explanation: "Este contenido fue generado por IA basándose en tus materiales de estudio. Revísalo antes de guardarlo.",
-                confidence: 0.75
+                confidence: 0.75,
+                factors: ["Análisis de texto local", "Materiales de estudio"],
+                sourceDescription: "Contenido generado"
             )
         }
         .padding(16)

@@ -1,15 +1,20 @@
 // QuizResultsView.swift
 // EchoStudy
-// A11Y: Quiz results summary
+// A11Y: Quiz results summary with reinforcement topics and trends
 
 import SwiftUI
 import SwiftData
 
 struct QuizResultsView: View {
     let session: QuizSession
+    @Bindable var viewModel: OralQuizViewModel
     @Environment(VoiceEngine.self) private var voiceEngine
+    @Environment(AppRouter.self) private var router
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
+    @State private var hasSaved = false
+    
+    @Query(sort: \QuizSession.completedAt, order: .reverse) private var pastSessions: [QuizSession]
     
     private var scorePercentage: Int {
         guard session.totalQuestions > 0 else { return 0 }
@@ -22,14 +27,48 @@ struct QuizResultsView: View {
         return ColorTheme.errorHex
     }
     
+    private var previousScore: Int? {
+        guard pastSessions.count > 1 else { return nil }
+        let prev = pastSessions[1]
+        guard prev.totalQuestions > 0 else { return nil }
+        return Int(Double(prev.score) / Double(prev.totalQuestions) * 100)
+    }
+    
+    private var trendText: String {
+        guard let prev = previousScore else { return "" }
+        let diff = scorePercentage - prev
+        if diff > 0 { return "↑ \(diff)% mejor que tu quiz anterior" }
+        if diff < 0 { return "↓ \(abs(diff))% menos que tu quiz anterior" }
+        return "→ Igual que tu quiz anterior"
+    }
+    
+    private var incorrectQuestions: [QuizQuestion] {
+        session.questions.filter { $0.isCorrect != true }
+    }
+    
+    private var correctQuestions: [QuizQuestion] {
+        session.questions.filter { $0.isCorrect == true }
+    }
+    
+    private var fullNarration: String {
+        var text = "Completaste el quiz. Tu puntuación: \(session.score) de \(session.totalQuestions), \(scorePercentage) por ciento. "
+        if !viewModel.masteredTopics.isEmpty {
+            text += "Temas dominados: \(viewModel.masteredTopics.map(\.title).joined(separator: ", ")). "
+        }
+        if !viewModel.topicsToReinforce.isEmpty {
+            text += "Temas a reforzar: \(viewModel.topicsToReinforce.map(\.title).joined(separator: ", "))."
+        }
+        return text
+    }
+    
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 24) {
-                    // MARK: - Score
+                    // MARK: - Score Card
                     VStack(spacing: 12) {
                         Text("\(session.score)/\(session.totalQuestions)")
-                            .font(.system(size: 56, weight: .bold, design: .rounded))
+                            .font(.system(size: 60, weight: .bold, design: .rounded))
                             .foregroundStyle(scoreColor)
                         
                         Text("\(scorePercentage)% correcto")
@@ -40,10 +79,90 @@ struct QuizResultsView: View {
                             .font(FontTheme.body)
                             .foregroundStyle(ColorTheme.adaptiveTextSecondary)
                             .multilineTextAlignment(.center)
+                        
+                        // Trend
+                        if !trendText.isEmpty {
+                            Text(trendText)
+                                .font(FontTheme.subheadline)
+                                .foregroundStyle(previousScore.map { scorePercentage >= $0 ? ColorTheme.successHex : ColorTheme.errorHex } ?? ColorTheme.adaptiveTextSecondary)
+                                .padding(.top, 4)
+                        }
                     }
                     .padding(24)
                     .glassEffect(in: .rect(cornerRadius: 24))
                     .padding(.horizontal)
+                    
+                    // MARK: - Topics to Reinforce
+                    if !viewModel.topicsToReinforce.isEmpty {
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text("Temas a reforzar")
+                                .font(FontTheme.title3)
+                                .foregroundStyle(ColorTheme.adaptiveText)
+                                .accessibilityAddTraits(.isHeader)
+                            
+                            ForEach(viewModel.topicsToReinforce) { topic in
+                                HStack(spacing: 12) {
+                                    Image(systemName: "exclamationmark.triangle.fill")
+                                        .foregroundStyle(ColorTheme.warningHex)
+                                        .accessibilityHidden(true)
+                                    
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text(topic.title)
+                                            .font(FontTheme.headline)
+                                            .foregroundStyle(ColorTheme.adaptiveText)
+                                        Text(topic.shortSummary)
+                                            .font(FontTheme.caption)
+                                            .foregroundStyle(ColorTheme.adaptiveTextSecondary)
+                                            .lineLimit(1)
+                                    }
+                                    
+                                    Spacer()
+                                    
+                                    Button {
+                                        HapticService.shared.light()
+                                        dismiss()
+                                        router.push(.topicDetail(topic))
+                                    } label: {
+                                        Text("Ir al tema")
+                                            .font(FontTheme.caption)
+                                            .foregroundStyle(ColorTheme.accentHex)
+                                    }
+                                    .accessibilityLabel("Ir al tema \(topic.title)")
+                                }
+                                .padding(12)
+                                .glassEffect(in: .rect(cornerRadius: 12))
+                            }
+                        }
+                        .padding(.horizontal)
+                    }
+                    
+                    // MARK: - Mastered Topics
+                    if !viewModel.masteredTopics.isEmpty {
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text("Temas dominados")
+                                .font(FontTheme.title3)
+                                .foregroundStyle(ColorTheme.adaptiveText)
+                                .accessibilityAddTraits(.isHeader)
+                            
+                            ForEach(viewModel.masteredTopics) { topic in
+                                HStack(spacing: 12) {
+                                    Image(systemName: "checkmark.seal.fill")
+                                        .foregroundStyle(ColorTheme.successHex)
+                                        .accessibilityHidden(true)
+                                    
+                                    Text(topic.title)
+                                        .font(FontTheme.body)
+                                        .foregroundStyle(ColorTheme.adaptiveText)
+                                    
+                                    Spacer()
+                                }
+                                .padding(12)
+                                .glassEffect(in: .rect(cornerRadius: 12))
+                                .accessibilityLabel("Tema dominado: \(topic.title)")
+                            }
+                        }
+                        .padding(.horizontal)
+                    }
                     
                     // MARK: - Question Review
                     VStack(alignment: .leading, spacing: 12) {
@@ -79,11 +198,34 @@ struct QuizResultsView: View {
                     .padding(.horizontal)
                     
                     // MARK: - Actions
-                    Button("Cerrar") {
-                        modelContext.insert(session)
-                        dismiss()
+                    VStack(spacing: 12) {
+                        Button {
+                            HapticService.shared.heavy()
+                            viewModel.resetForRepeatQuiz()
+                            dismiss()
+                            Task { await viewModel.startQuiz() }
+                        } label: {
+                            HStack {
+                                Image(systemName: "arrow.counterclockwise")
+                                Text("Repetir quiz")
+                            }
+                            .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(PrimaryButtonStyle())
+                        
+                        Button {
+                            HapticService.shared.medium()
+                            viewModel.resetForNewQuiz()
+                            dismiss()
+                        } label: {
+                            HStack {
+                                Image(systemName: "plus.circle")
+                                Text("Nuevo quiz")
+                            }
+                            .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(SecondaryButtonStyle())
                     }
-                    .buttonStyle(PrimaryButtonStyle())
                     .padding(.horizontal)
                 }
                 .padding(.vertical)
@@ -93,11 +235,15 @@ struct QuizResultsView: View {
             .announceOnAppear("Resultado del quiz: \(session.score) de \(session.totalQuestions) correctas. \(scorePercentage) por ciento.")
         }
         .onAppear {
-            voiceEngine.speak(
-                "Resultado del quiz: \(session.score) de \(session.totalQuestions) correctas. \(scoreMessage)",
-                priority: .high
-            )
+            saveSession()
+            voiceEngine.speak(fullNarration, priority: .high)
         }
+    }
+    
+    private func saveSession() {
+        guard !hasSaved else { return }
+        hasSaved = true
+        modelContext.insert(session)
     }
     
     private var scoreMessage: String {

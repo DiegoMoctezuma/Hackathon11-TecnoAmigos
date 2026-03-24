@@ -6,11 +6,14 @@ import SwiftUI
 
 struct VoiceButton: View {
     let state: VoiceEngineState
+    /// Real mic audio level (0.0 – 1.0) for visual ring feedback
+    var audioLevel: Float = 0.0
     let action: () -> Void
     let size: CGFloat
     
-    init(state: VoiceEngineState, size: CGFloat = 60, action: @escaping () -> Void) {
+    init(state: VoiceEngineState, audioLevel: Float = 0.0, size: CGFloat = 60, action: @escaping () -> Void) {
         self.state = state
+        self.audioLevel = audioLevel
         self.size = size
         self.action = action
     }
@@ -42,14 +45,19 @@ struct VoiceButton: View {
             action()
         }) {
             ZStack {
-                // Pulse animation rings for listening state
+                // Pulse rings that react to real audio level
                 if state == .listening {
+                    let level = CGFloat(audioLevel)
                     ForEach(0..<3, id: \.self) { index in
                         Circle()
-                            .stroke(ColorTheme.accentHex.opacity(0.3 - Double(index) * 0.1), lineWidth: 2)
+                            .stroke(
+                                ColorTheme.accentHex.opacity(0.15 + level * 0.35 - Double(index) * 0.08),
+                                lineWidth: 2 + level * 2
+                            )
                             .frame(width: size + CGFloat(index) * 16, height: size + CGFloat(index) * 16)
-                            .scaleEffect(pulseScale)
+                            .scaleEffect(1.0 + level * 0.2)
                     }
+                    .animation(.easeOut(duration: 0.1), value: audioLevel)
                 }
                 
                 Image(systemName: iconName)
@@ -69,13 +77,8 @@ struct VoiceButton: View {
         .accessibleTapTarget(minSize: size)
         .onChange(of: state) { _, newState in
             if newState == .listening {
-                withAnimation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true)) {
-                    pulseScale = 1.15
-                }
-            } else {
-                withAnimation {
-                    pulseScale = 1.0
-                }
+                // Haptic pulse to confirm mic is active
+                HapticService.shared.medium()
             }
         }
     }

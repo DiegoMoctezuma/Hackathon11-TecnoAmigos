@@ -22,6 +22,9 @@ enum Route: Hashable {
     case dataPrivacy
     case about
     case onboarding
+    case quizHistory
+    case collaboration
+    case collaborationOnboarding
     
     func hash(into hasher: inout Hasher) {
         switch self {
@@ -40,6 +43,9 @@ enum Route: Hashable {
         case .dataPrivacy: hasher.combine("privacy")
         case .about: hasher.combine("about")
         case .onboarding: hasher.combine("onboarding")
+        case .quizHistory: hasher.combine("quizHistory")
+        case .collaboration: hasher.combine("collaboration")
+        case .collaborationOnboarding: hasher.combine("collabOnboarding")
         }
     }
     
@@ -50,11 +56,20 @@ enum Route: Hashable {
 
 // MARK: - App Router
 
+/// Actions that should auto-trigger when arriving at the Upload tab
+enum PendingUploadAction {
+    case camera
+    case gallery
+    case document
+}
+
 @Observable
 @MainActor
 final class AppRouter {
     var path = NavigationPath()
     var selectedTab: AppTab = .home
+    /// Set this before switching to the upload tab to auto-open camera/gallery/document
+    var pendingUploadAction: PendingUploadAction?
     
     func push(_ route: Route) {
         path.append(route)
@@ -67,6 +82,35 @@ final class AppRouter {
     
     func popToRoot() {
         path = NavigationPath()
+    }
+    
+    /// Navigate to a tab or go back based on a voice command
+    func navigateByVoice(_ command: VoiceCommand) {
+        switch command {
+        case .goHome:
+            selectedTab = .home
+            popToRoot()
+        case .goUpload:
+            selectedTab = .upload
+        case .goQuiz:
+            selectedTab = .quiz
+        case .goSettings:
+            selectedTab = .settings
+        case .goBack:
+            pop()
+        // Upload actions: switch to upload tab and queue the action
+        case .openCamera:
+            pendingUploadAction = .camera
+            selectedTab = .upload
+        case .openGallery:
+            pendingUploadAction = .gallery
+            selectedTab = .upload
+        case .openDocument:
+            pendingUploadAction = .document
+            selectedTab = .upload
+        default:
+            break
+        }
     }
 }
 

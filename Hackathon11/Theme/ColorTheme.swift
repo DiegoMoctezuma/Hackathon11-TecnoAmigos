@@ -8,9 +8,9 @@ import SwiftUI
 
 enum ColorTheme {
     // MARK: - Fallback Hex Colors
-    static let primaryHex = Color(hex: "#1B4965")
-    static let secondaryHex = Color(hex: "#62B6CB")
-    static let accentHex = Color(hex: "#F4A261")
+    static let primaryHex = Color(hex: "#0077b6")
+    static let secondaryHex = Color(hex: "#00b4d8")
+    static let accentHex = Color(hex: "#00b4d8")
     static let backgroundLight = Color(hex: "#FAF9F6")
     static let backgroundDark = Color(hex: "#0D1117")
     static let surfaceLight = Color(hex: "#FFFFFF")

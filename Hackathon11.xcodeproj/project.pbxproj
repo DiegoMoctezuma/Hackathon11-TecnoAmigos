@@ -10,9 +10,22 @@
 		06CD1DF12F71E0D0005E29A9 /* Hackathon11.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Hackathon11.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		069399E82F72F74600F50B81 /* Exceptions for "Hackathon11" folder in "Hackathon11" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 06CD1DF02F71E0D0005E29A9 /* Hackathon11 */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		06CD1DF32F71E0D0005E29A9 /* Hackathon11 */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				069399E82F72F74600F50B81 /* Exceptions for "Hackathon11" folder in "Hackathon11" target */,
+			);
 			path = Hackathon11;
 			sourceTree = "<group>";
 		};
@@ -256,6 +269,11 @@
 				DEVELOPMENT_TEAM = ZZR5Q2YX8A;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Hackathon11/Info.plist;
+				INFOPLIST_KEY_NSCameraUsageDescription = "ARGOS necesita la cámara para tomar fotos de pizarrones y documentos.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "ARGOS necesita acceso al micrófono para reconocer tu voz y responder a tus preguntas.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "ARGOS necesita acceso a tus fotos para procesar imágenes de apuntes.";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "ARGOS usa reconocimiento de voz para que puedas interactuar con la app hablando.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -288,6 +306,11 @@
 				DEVELOPMENT_TEAM = ZZR5Q2YX8A;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Hackathon11/Info.plist;
+				INFOPLIST_KEY_NSCameraUsageDescription = "ARGOS necesita la cámara para tomar fotos de pizarrones y documentos.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "ARGOS necesita acceso al micrófono para reconocer tu voz y responder a tus preguntas.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "ARGOS necesita acceso a tus fotos para procesar imágenes de apuntes.";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "ARGOS usa reconocimiento de voz para que puedas interactuar con la app hablando.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

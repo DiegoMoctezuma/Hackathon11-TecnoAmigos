@@ -1,48 +1,81 @@
 // SettingsView.swift
 // EchoStudy
-// A11Y: Grouped settings with full VoiceOver support
+// A11Y: Grouped settings with 5 sections and full VoiceOver support
 
 import SwiftUI
 
+// MARK: - Settings Sub-Navigation
+
+enum SettingsDestination: Hashable {
+    case voice
+    case accessibility
+    case dataPrivacy
+    case about
+}
+
 struct SettingsView: View {
-    @Environment(AppRouter.self) private var router
+    // Settings uses its own NavigationStack for sub-pages
+    
+    // A11Y: Local path for settings sub-navigation
+    @State private var settingsPath = NavigationPath()
     
     var body: some View {
-        ScrollView {
-            VStack(spacing: 16) {
-                // MARK: - Voice
-                settingsSection(title: "Voz", icon: "waveform") {
-                    settingsRow(icon: "speaker.wave.3.fill", title: "Configuración de voz", subtitle: "Velocidad, tono, idioma") {
-                        router.push(.voiceSettings)
+        NavigationStack(path: $settingsPath) {
+            ScrollView {
+                VStack(spacing: 16) {
+                    // MARK: - Voice
+                    settingsSection(title: "Voz", icon: "waveform") {
+                        settingsRow(icon: "speaker.wave.3.fill", title: "Configuración de voz", subtitle: "Velocidad, selección de voz, idioma") {
+                            settingsPath.append(SettingsDestination.voice)
+                        }
+                    }
+                    
+                    // MARK: - Accessibility
+                    settingsSection(title: "Accesibilidad", icon: "accessibility") {
+                        settingsRow(icon: "textformat.size", title: "Accesibilidad visual", subtitle: "Contraste, tamaño, haptics, sonidos") {
+                            settingsPath.append(SettingsDestination.accessibility)
+                        }
+                    }
+                    
+                    // MARK: - Data & Privacy
+                    settingsSection(title: "Datos y privacidad", icon: "lock.shield") {
+                        settingsRow(icon: "hand.raised.fill", title: "Privacidad de datos", subtitle: "Almacenamiento local y permisos") {
+                            settingsPath.append(SettingsDestination.dataPrivacy)
+                        }
+                    }
+                    
+                    // MARK: - AI
+                    settingsSection(title: "Inteligencia Artificial", icon: "brain") {
+                        settingsRow(icon: "cpu.fill", title: "Configuración de IA", subtitle: "Transparencia y consentimiento de datos") {
+                            settingsPath.append(SettingsDestination.dataPrivacy)
+                        }
+                    }
+                    
+                    // MARK: - About
+                    settingsSection(title: "Información", icon: "info.circle") {
+                        settingsRow(icon: "info.circle.fill", title: "Acerca de EchoStudy", subtitle: "Versión, créditos y licencias") {
+                            settingsPath.append(SettingsDestination.about)
+                        }
                     }
                 }
-                
-                // MARK: - Accessibility
-                settingsSection(title: "Accesibilidad", icon: "accessibility") {
-                    settingsRow(icon: "textformat.size", title: "Accesibilidad visual", subtitle: "Contraste, tamaño, haptics") {
-                        router.push(.accessibilitySettings)
-                    }
-                }
-                
-                // MARK: - Data
-                settingsSection(title: "Datos", icon: "lock.shield") {
-                    settingsRow(icon: "hand.raised.fill", title: "Privacidad de datos", subtitle: "Almacenamiento y permisos") {
-                        router.push(.dataPrivacy)
-                    }
-                }
-                
-                // MARK: - About
-                settingsSection(title: "Información", icon: "info.circle") {
-                    settingsRow(icon: "info.circle.fill", title: "Acerca de EchoStudy", subtitle: "Versión y créditos") {
-                        router.push(.about)
-                    }
+                .padding(.vertical)
+            }
+            .background(ColorTheme.backgroundGradient.ignoresSafeArea())
+            .navigationTitle("Ajustes")
+            .navigationDestination(for: SettingsDestination.self) { destination in
+                switch destination {
+                case .voice:
+                    VoiceSettingsView()
+                case .accessibility:
+                    AccessibilitySettingsView()
+                case .dataPrivacy:
+                    DataPrivacyView()
+                case .about:
+                    AboutView()
                 }
             }
-            .padding(.vertical)
+            .announceOnAppear("Ajustes de ARGOS")
         }
-        .background(ColorTheme.backgroundGradient.ignoresSafeArea())
-        .navigationTitle("Ajustes")
-        .announceOnAppear("Ajustes de EchoStudy")
     }
     
     private func settingsSection(title: String, icon: String, @ViewBuilder content: () -> some View) -> some View {
@@ -90,6 +123,7 @@ struct SettingsView: View {
                     .foregroundStyle(ColorTheme.adaptiveTextSecondary)
             }
             .padding(16)
+            .frame(minHeight: 48)
             .glassEffect(in: .rect(cornerRadius: 16))
         }
         .padding(.horizontal)

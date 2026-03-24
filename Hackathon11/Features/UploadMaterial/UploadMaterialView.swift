@@ -75,6 +75,7 @@ struct UploadMaterialView: View {
             )
         }
         .announceOnAppear("Subir material de estudio. Selecciona cómo quieres subir: foto, galería o documento.")
+        
     }
     
     // MARK: - Upload Header
