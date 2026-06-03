@@ -1,55 +1,60 @@
 # ARGOS 🏛️👁️
 
-## 🎯 Objetivo Principal
-Acortar la distancia entre los estudiantes con discapacidad visual y la vida académica. Con ARGOS, el estudiante tiene la capacidad de "ver" qué hay en el pizarrón o acceder a los recursos gráficos de cualquier materia de forma autónoma.
-
-## 💡 Solución del Problema
-Con la ayuda de modelos de *machine learning* y visión computacional, es posible analizar y comprender la imagen del pizarrón o cualquier otro recurso gráfico que pueda llegar a ser usado en clase. 
-
-En conjunto con tecnología de modelos de lenguaje (LLM/LMM), podemos crear resúmenes tanto generales como específicos acerca de la sesión. Estos textos, a su vez, son convertidos a archivos de audio que el estudiante puede escuchar en tiempo real. 
-
-Yendo un paso más allá, la tecnología permite al estudiante hablar directamente con la aplicación mediante comandos de voz. De esta manera, el usuario puede interactuar con el asistente, discutir los tópicos y subtemas que la app clasifica automáticamente, y preguntar dudas específicas acerca del material de estudio.
+> App iOS para estudiantes con discapacidad visual que convierte cualquier imagen de pizarrón o material de clase en texto, audio y cuestionarios mediante IA.  
+> **Hackathon 11 · FES Acatlán** — Clasificación a fase nacional 2026.
 
 ---
 
-## 📱 Secciones de la Aplicación
+## ¿Qué hace?
 
-A continuación se detalla la arquitectura de vistas y las funcionalidades principales de cada sección de la app:
+El estudiante apunta la cámara al pizarrón (o sube una foto/documento). ARGOS extrae el texto con OCR, detecta los temas automáticamente, genera resúmenes y los convierte en audio. Desde ahí puede hacer preguntas por voz o tomar un quiz oral sobre el material, todo sin necesidad de leer una pantalla.
 
-### 🚀 Onboarding (Configuración Inicial)
-* **OnboardingView:** Pantalla de bienvenida que introduce al usuario a las capacidades de ARGOS.
-* **AccessibilitySetupView:** Configuración inicial para adaptar la interfaz a las necesidades visuales o de interacción del usuario.
-* **VoiceCalibrationView:** Calibración del motor de reconocimiento y síntesis de voz para asegurar una interacción óptima con el asistente.
+---
 
-### 🏠 Home (Inicio)
-* **HomeView:** El panel principal de la aplicación. Muestra un resumen general del progreso del usuario.
-* **RecentActivityRow:** Un historial rápido para retomar las últimas sesiones de estudio o cuestionarios.
-* **SubjectCardView / QuickUploadButton:** Accesos directos e intuitivos para explorar las materias guardadas o cargar nuevos documentos al instante.
+## Pipeline de procesamiento
 
-### 📚 Subjects & Topics (Gestión de Estudio)
-* **SubjectDetailView & SubjectConversationsView:** Vistas dedicadas a mostrar el contenido específico de una materia y las interacciones/consultas previas que el usuario ha tenido con la IA sobre esa materia.
-* **TopicDetailView:** Desglose detallado de temas y subtemas generados a partir del material de estudio, facilitando la lectura estructurada.
-* **NewSubjectSheet:** Interfaz rápida para registrar y categorizar nuevas áreas de estudio.
+```
+Imagen → OCR (Vision) → Análisis estructural → Extracción de temas → Resúmenes → Audio
+```
 
-### 🎙️ Voice Assistant (Asistente de Voz)
-* **VoiceAssistantView:** La interfaz conversacional principal donde el usuario interactúa mediante voz con la aplicación.
-* **VoiceWaveformView:** Retroalimentación visual en tiempo real que indica cuando el sistema está escuchando o procesando audio.
-* **FloatingVoiceButton:** Un botón de acceso global para invocar al asistente desde cualquier parte de la aplicación.
+1. **OCR** — Apple Vision framework en nivel `.accurate`, soporte español/inglés, post-procesamiento para limpiar artefactos y unir líneas cortadas
+2. **Extracción de temas** — análisis del texto para detectar temas y subtemas con nivel de confianza
+3. **Generación de resúmenes** — versión corta y versión completa por tema
+4. **RAG** — el asistente de voz consulta los materiales del estudiante para responder preguntas en contexto
 
-### 📝 Oral Quiz (Repaso y Cuestionarios)
-* **QuizSetupView:** Permite al usuario configurar un examen de práctica sobre un tema específico.
-* **QuizSessionView:** La vista activa del cuestionario, diseñada para ser operada de forma interactiva y, si se requiere, enteramente por voz.
-* **QuizFeedbackView & QuizResultsView:** Proporcionan retroalimentación inmediata sobre las respuestas dadas, explicando los aciertos y las áreas de mejora mediante IA.
+---
 
-### 📤 Upload Material (Carga y Procesamiento)
-* **UploadMaterialView:** Centro de digitalización. Permite al usuario subir imágenes, documentos o texto plano. Detrás de escena, se apoya en servicios OCR y análisis estructural para convertir imágenes en texto estructurado y comprensible.
-* **ProcessingStepsView:** Muestra al usuario el progreso del análisis de la IA (extracción de texto, generación de resúmenes, creación de cuestionarios) para que nunca se quede en la incertidumbre.
+## Funcionalidades principales
 
-### 🧠 Human-Centered AI (Transparencia y Control)
-* Esta sección es el núcleo ético de la app. Incluye vistas como **AITransparencyCard**, **AIExplanationSheet** y **ConfidenceIndicator**, las cuales le explican al usuario *por qué* la IA le está dando una respuesta específica o qué tanta "seguridad" tiene sobre un dato.
-* **HumanOverrideView & DataConsentView:** Otorgan el control total al usuario, permitiéndole corregir a la IA si se equivoca y gestionar el consentimiento de sus datos, asegurando que la tecnología trabaje para el humano y no al revés.
+**🎙️ Asistente de voz** — la voz es el canal primario, no el texto. FloatingVoiceButton accesible desde cualquier pantalla, con retroalimentación de onda en tiempo real.
 
-### ⚙️ Settings (Ajustes)
-* **SettingsView:** Panel de configuración general.
-* **AccessibilitySettingsView & VoiceSettingsView:** Ajustes profundos para personalizar el contraste, tamaños de fuente, velocidad de lectura y comportamiento del motor de voz.
-* **DataPrivacyView:** Gestión de la privacidad de la información académica y preferencias del usuario.
+**📝 Quiz oral** — cuestionarios generados desde el material del estudiante, con tres niveles de dificultad (Básico, Intermedio, Avanzado). Operables completamente por voz.
+
+**🧠 IA Centrada en el Humano (HCAI)** — cada resultado incluye un card "¿Cómo se generó esto?" con el nivel de confianza, los factores considerados y la fuente. El usuario puede corregir a la IA y gestionar el consentimiento de sus datos.
+
+**♿ Accesibilidad como núcleo** — configuración inicial de contraste, tamaño de fuente y velocidad de voz; calibración del motor de reconocimiento en onboarding.
+
+---
+
+## Tech Stack
+
+- **Swift 5.9 + SwiftUI**
+- **iOS 17+** — `@Observable`, `@MainActor`
+- **SwiftData** — persistencia de materiales y sesiones
+- **Apple Vision** — OCR
+- **AVFoundation** — síntesis y reconocimiento de voz
+- Arquitectura MVVM con feature-based folder structure
+
+---
+
+## Correr el proyecto
+
+```bash
+git clone https://github.com/DiegoMoctezuma/Hackathon11-TecnoAmigos.git
+cd Hackathon11-TecnoAmigos
+open ARGOS.xcodeproj
+```
+
+Requiere Xcode 15+ e iOS 17. Sin dependencias externas — cero SPM, cero CocoaPods.
+
+> El pipeline de IA tiene un toggle `useMockData` en `AIServiceManager` para correr en modo demo sin necesidad de conectarse a un LLM externo.
